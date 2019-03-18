@@ -146,7 +146,7 @@ public class QRCodeProducer {
         return bitmap;
     }
 
-    private static String getUniqueId(Context context) {
+    public static String getUniqueId(Context context) {
         String androidID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         String id = androidID + Build.SERIAL;
         return androidID;

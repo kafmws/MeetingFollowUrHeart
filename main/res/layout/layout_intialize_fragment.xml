@@ -12,10 +12,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2">
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_deviceId"
+            android:text="设备号:"
+            android:textSize="25sp"
+            android:paddingLeft="125dp"
+            android:paddingStart="125dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="30dp" />
 
         <EditText
-            android:id="@+id/et_deviceId"
+            android:id="@+id/et_doorplate"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_gravity="center"
@@ -23,7 +35,7 @@
             android:paddingStart="10dp"
             android:layout_marginHorizontal="120dp"
             android:background="@drawable/selector_et"
-            android:hint="请在此输入该设备的ID"
+            android:hint="请在此输入该设备的门牌号"
             android:imeOptions="actionDone"
             android:singleLine="true"
             android:maxLines="1"

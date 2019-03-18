@@ -11,33 +11,78 @@ android:fitsSystemWindows="true">
     android:layout_width="match_parent">
 </FrameLayout>
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="49"
-        android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="500dp"
+        android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <include layout="@layout/layout_room_details"/>
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_absence"
-            android:text="签到"
-            android:layout_gravity="end"
-            android:textColor="@color/white"
+        <include layout="@layout/layout_room_details"
+            android:id="@+id/layout_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-    </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_status"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <Button
+                android:id="@+id/btn_absence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="签到"
+                android:textColor="@color/white" />
+
+            <ImageView
+                android:id="@+id/iv_QRCode"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="25dp"
+                android:layout_marginLeft="25dp"
+                android:onClick="showQRCode"
+                android:src="@drawable/qr_code" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_toEndOf="@+id/iv_QRCode"
+                android:layout_toRightOf="@+id/iv_QRCode"
+                android:onClick="showQRCode"
+                android:text=" 点击预定"
+                android:textSize="32sp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="49"
-        android:layout_gravity="end">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_head"
+            android:gravity="center"
+            android:text="会议列表"
+            android:textSize="30sp"
+            android:textColor="@color/white"
+            android:background="@color/startColor"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="10dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_meetings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
 

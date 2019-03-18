@@ -9,13 +9,13 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.hp.constant.AppData;
 import com.example.hp.model.R;
@@ -24,7 +24,8 @@ public class InitializeFragment extends Fragment {
 
     private String TAG = "InitFragment";
 
-    private EditText ed_deviceId;
+    private TextView tv_deviceId;
+    private EditText et_doorplate;
     private Button btn_sure;
 
     @Nullable
@@ -33,8 +34,10 @@ public class InitializeFragment extends Fragment {
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         final View view = inflater.inflate(R.layout.layout_intialize_fragment, container, false);
-        ed_deviceId = view.findViewById(R.id.et_deviceId);
-        ed_deviceId.setOnClickListener(new View.OnClickListener() {
+        tv_deviceId = view.findViewById(R.id.tv_deviceId);
+        tv_deviceId.setText("设备号: "+AppData.getDeviceID());
+        et_doorplate = view.findViewById(R.id.et_doorplate);
+        et_doorplate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((EditText)v).setCursorVisible(true);
@@ -44,7 +47,7 @@ public class InitializeFragment extends Fragment {
         btn_sure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppData.setDeviceID(ed_deviceId.getText().toString());
+                AppData.setDeviceID(et_doorplate.getText().toString());
                 AppData.setHasDeviceId(true);
                 Activity activity = getActivity();
                 SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);

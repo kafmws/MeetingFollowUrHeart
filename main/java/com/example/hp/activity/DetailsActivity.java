@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +39,8 @@ public class DetailsActivity extends BaseActivity {
     private TextView tv_date;
     private TextView tv_time;
     private Button btn_absence;
+    private TextView tv_head;
+    private RecyclerView rv_meetings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +92,10 @@ public class DetailsActivity extends BaseActivity {
         if (fragment != null) {
             manager.beginTransaction().remove(fragment).commit();
         }
+    }
+
+    public void showQRCode(View view) {
+
     }
 
     class TimeThread extends Thread {
