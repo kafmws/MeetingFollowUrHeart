@@ -7,6 +7,7 @@ public class AppData {
     private static boolean hasDeviceId;
     private static String deviceID;
     private static String doorplate;
+    private static String api = "http://www.shidongxuan.top/smartMeeting_Web/access/getInfoByRoomNumber.do";
 
     public static String getDeviceID() {
         return deviceID;
@@ -38,5 +39,9 @@ public class AppData {
 
     public static void setDoorplate(String doorplate) {
         AppData.doorplate = doorplate;
+    }
+
+    public static String getApi() {
+        return api;
     }
 }

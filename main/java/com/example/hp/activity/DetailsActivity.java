@@ -3,18 +3,17 @@ package com.example.hp.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.icu.util.Calendar;
 import android.icu.util.TimeZone;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -22,10 +21,24 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hp.adapter.MeetingsAdapter;
 import com.example.hp.constant.AppData;
+import com.example.hp.model.MeetingDetails;
+import com.example.hp.model.MeetingRoom;
 import com.example.hp.model.R;
+import com.example.hp.util.OkHttpHelper;
+import com.example.hp.util.ResponseDataParser;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
+import static com.example.hp.constant.AppData.getApi;
+import static com.example.hp.constant.AppData.getDoorplate;
 
 public class DetailsActivity extends BaseActivity {
 
@@ -33,6 +46,8 @@ public class DetailsActivity extends BaseActivity {
     private final int msgTime = 1;
     private StringBuilder time;
     private SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd HH:mm:ss");
+    private List<MeetingDetails> meetings;
+    private MeetingsAdapter adapter;
 
     private TextView tv_doorplate;
     private TextView tv_status;
@@ -41,6 +56,7 @@ public class DetailsActivity extends BaseActivity {
     private Button btn_absence;
     private TextView tv_head;
     private RecyclerView rv_meetings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +78,7 @@ public class DetailsActivity extends BaseActivity {
             AppData.setDeviceID(sp.getString("deviceId", null));
             findViewById(R.id.fragment_init).setVisibility(View.GONE);
             tv_doorplate = findViewById(R.id.tv_doorplate);
+            rv_meetings = findViewById(R.id.rv_meetings);
             tv_status = findViewById(R.id.tv_status);
             tv_date = findViewById(R.id.tv_date);
             tv_time = findViewById(R.id.tv_time);
@@ -76,6 +93,7 @@ public class DetailsActivity extends BaseActivity {
                 }
             });
             (new TimeThread()).start();
+            getMeetings();
         } else {
             FragmentManager manager = getSupportFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
@@ -151,6 +169,35 @@ public class DetailsActivity extends BaseActivity {
                 break;
         }
         return time.toString();
+    }
+
+    private void getMeetings(){
+        StringBuilder builder = new StringBuilder(getApi());
+        builder.append("?roomNumber=");
+        builder.append(getDoorplate());
+        OkHttpHelper.SendOkHttpRequest(builder.toString(), new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(DetailsActivity.this, "网络超时", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                MeetingRoom.DataBean dataBean =
+                        ResponseDataParser.RoomDataParser(response.body().string());
+                if(dataBean.getStatus()==0){
+                    meetings = ResponseDataParser.MeetingsDetailsParser(dataBean);
+                    if(adapter == null){
+                        adapter = new MeetingsAdapter(meetings, DetailsActivity.this);
+                        rv_meetings.setLayoutManager(new LinearLayoutManager(DetailsActivity.this));
+                        rv_meetings.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+                    }
+                }else{
+                    Toast.makeText(DetailsActivity.this, "网络超时", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 }
