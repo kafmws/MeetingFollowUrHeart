@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,20 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hp.constant.AppData;
 import com.example.hp.model.R;
+import com.example.hp.util.OkHttpHelper;
+import com.example.hp.util.ResponseDataParser;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class InitializeFragment extends Fragment {
 
@@ -47,21 +59,62 @@ public class InitializeFragment extends Fragment {
         btn_sure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppData.setDeviceID(et_doorplate.getText().toString());
-                AppData.setHasDeviceId(true);
-                Activity activity = getActivity();
-                SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putBoolean("hasDeviceId", true);
-                editor.putString("deviceId",AppData.getDeviceID());
-                editor.apply();
-                FragmentManager manager = ((FragmentActivity)activity).getSupportFragmentManager();
-                Fragment fragment = manager.findFragmentById(R.id.fragment_init);
-                if(fragment!=null){
-                    manager.beginTransaction().remove(fragment).commit();
-                }
-                activity.findViewById(R.id.fragment_init).setVisibility(View.GONE);
-                ((DetailsActivity)activity).initialize();
+                final Activity activity = getActivity();
+                final String doorplate = et_doorplate.getText().toString();
+                OkHttpHelper.PostOkHttpRequest(new Request.Builder()
+                                .url("http://www.shidongxuan.top/smartMeeting_Web/access/checkMapping.do")
+                                .header("Content-Type", "application/x-www-form-urlencoded")
+                                .post(new FormBody.Builder()
+                                        .add("roomNumber", doorplate)
+                                        .add("machineNumber",AppData.getDeviceID()).build())
+                                .build()
+                        , new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.e(TAG, "网络请求失败"+e.getMessage());
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity,"网络超时", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if(!ResponseDataParser.validateDoorplateParser(response.body().string())){
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(activity,"绑定有误！请核实后重试！", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            Log.e(TAG, "绑定失败");
+                            Log.e(TAG,AppData.getDeviceID());
+                        }else{
+                            Log.e(TAG, "绑定成功");
+                            AppData.setDoorplate(doorplate);
+                            AppData.setHasDoorplate(true);
+                            SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putBoolean("hasDoorplate", true);
+                            editor.putString("doorplate",AppData.getDoorplate());
+                            editor.apply();
+                            FragmentManager manager = ((FragmentActivity)activity).getSupportFragmentManager();
+                            Fragment fragment = manager.findFragmentById(R.id.fragment_init);
+                            if(fragment!=null){
+                                manager.beginTransaction().remove(fragment).commit();
+                            }
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    activity.findViewById(R.id.fragment_init).setVisibility(View.GONE);
+                                    ((DetailsActivity)activity).initialize();
+                                }
+                            });
+                        }
+                    }
+                });
             }
         });
         return view;

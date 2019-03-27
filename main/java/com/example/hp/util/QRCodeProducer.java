@@ -30,15 +30,15 @@ public class QRCodeProducer {
     public static Bitmap getStandardQRCode(Context context) {
         File file = context.getCacheDir();
         String filePath = file.getAbsolutePath() + "\\QRCode.jpg";
-        try {
-            return createQRCode(DesUtil.talker.encrypt(getDoorplate()),//+ "\n"+getIMEI(context),
-                    100, 100, null, filePath);
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-        return null;
+//        try {
+            return createQRCode(getDoorplate(),//DesUtil.talker.encrypt(getDoorplate())+ "\n"+getIMEI(context),
+                    800, 800, null, filePath);
+//        } catch (BadPaddingException e) {
+//            e.printStackTrace();
+//        } catch (IllegalBlockSizeException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
     }
 
     /**

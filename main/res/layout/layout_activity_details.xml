@@ -11,6 +11,13 @@ android:fitsSystemWindows="true">
     android:layout_width="match_parent">
 </FrameLayout>
 
+    <ImageView
+        android:id="@+id/iv_QR"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:background="#CCCCCC"/>
+
     <RelativeLayout
         android:layout_width="500dp"
         android:layout_height="match_parent">
@@ -31,6 +38,7 @@ android:fitsSystemWindows="true">
                 android:id="@+id/btn_absence"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="showQRCode"
                 android:text="签到"
                 android:textColor="@color/white" />
 

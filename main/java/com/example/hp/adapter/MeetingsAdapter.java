@@ -8,15 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.hp.model.MeetingDetails;
 import com.example.hp.model.R;
 
-import java.util.Date;
+import com.example.hp.model.MeetingRoom.DataBean.MeetingListsBean;
+
 import java.util.List;
 
 public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHolder> {
 
-    private List<MeetingDetails> meetings;
+    private List<MeetingListsBean> meetings;
 
     private Context mContext;
 
@@ -26,7 +26,7 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
         this.mListener = mListener;
     }
 
-    public MeetingsAdapter(List<MeetingDetails> meetings, Context mContext) {
+    public MeetingsAdapter(List<MeetingListsBean> meetings, Context mContext) {
         this.meetings = meetings;
         this.mContext = mContext;
     }
@@ -42,7 +42,7 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int pos) {
-        MeetingDetails meeting = meetings.get(pos);
+        MeetingListsBean meeting = meetings.get(pos);
         viewHolder.setData(meeting, pos);
     }
 
@@ -82,15 +82,14 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
             line = itemView.findViewById(R.id.view_line);
         }
 
-        void setData(MeetingDetails meeting, int i) {
+        void setData(MeetingListsBean meeting, int i) {
 //            view.setTag(i);
-            MeetingDetails.DataBean data = meeting.getData();
-            tv_meeting_name.setText(data.getMeetingName());
-            tv_people_number.setText(data.getPeopleNum());
-            tv_place.setText(data.getRoomName());
+            tv_meeting_name.setText(meeting.getMeetingName());
+            tv_people_number.setText(String.valueOf(meeting.getPeopleNum()));
+            tv_place.setText(meeting.getRoomName());
             tv_meeting_time_length.setText("100");
             tv_meeting_master.setText("");
-            tv_meeting_time.setText(data.getStartTime());
+            tv_meeting_time.setText(meeting.getStartTime());
             if (i == meetings.size() - 1) {
                 line.setVisibility(View.GONE);
             } else {

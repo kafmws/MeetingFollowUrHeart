@@ -18,36 +18,44 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hp.adapter.MeetingsAdapter;
 import com.example.hp.constant.AppData;
-import com.example.hp.model.MeetingDetails;
 import com.example.hp.model.MeetingRoom;
 import com.example.hp.model.R;
 import com.example.hp.util.OkHttpHelper;
+import com.example.hp.util.QRCodeProducer;
 import com.example.hp.util.ResponseDataParser;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static com.example.hp.constant.AppData.getApi;
+import static com.example.hp.model.MeetingRoom.DataBean.MeetingListsBean;
 import static com.example.hp.constant.AppData.getDoorplate;
 
 public class DetailsActivity extends BaseActivity {
 
     private String TAG = "DetailsActivity";
     private final int msgTime = 1;
+    private final int msgSetAdapter = 2;
     private StringBuilder time;
     private SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd HH:mm:ss");
-    private List<MeetingDetails> meetings;
+    private MeetingRoom room;
+    private List<MeetingListsBean> meetings = new ArrayList<>();
+    private MeetingListsBean currentMeeting;
     private MeetingsAdapter adapter;
+    private boolean isPay = true;
+    private boolean QRVisible =false;
 
     private TextView tv_doorplate;
     private TextView tv_status;
@@ -56,6 +64,7 @@ public class DetailsActivity extends BaseActivity {
     private Button btn_absence;
     private TextView tv_head;
     private RecyclerView rv_meetings;
+    private ImageView iv_QR;
 
 
     @Override
@@ -73,9 +82,9 @@ public class DetailsActivity extends BaseActivity {
 
     public void initialize() {
         SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
-        AppData.setHasDeviceId(sp.getBoolean("hasDeviceId", false));
-        if (AppData.hasDeviceId()) {//已初始化
-            AppData.setDeviceID(sp.getString("deviceId", null));
+        AppData.setHasDoorplate(sp.getBoolean("hasDoorplate", false));
+        if (AppData.isHasDoorplate()&&getDoorplate()!=null) {//已初始化
+            AppData.setDeviceID(sp.getString("doorplate", null));
             findViewById(R.id.fragment_init).setVisibility(View.GONE);
             tv_doorplate = findViewById(R.id.tv_doorplate);
             rv_meetings = findViewById(R.id.rv_meetings);
@@ -83,12 +92,28 @@ public class DetailsActivity extends BaseActivity {
             tv_date = findViewById(R.id.tv_date);
             tv_time = findViewById(R.id.tv_time);
             btn_absence = findViewById(R.id.btn_absence);
+            iv_QR = findViewById(R.id.iv_QR);
+            iv_QR.setVisibility(View.GONE);
+            adapter = new MeetingsAdapter(meetings, this);
+            rv_meetings.setAdapter(adapter);
+            rv_meetings.setLayoutManager(new LinearLayoutManager(this));
             btn_absence.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     PermissionCheck();
+                    if(currentMeeting==null){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(DetailsActivity.this,"暂无会议进行",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        return;
+                    }
                     Log.e(TAG,"准备签到");
                     Intent intent = new Intent(DetailsActivity.this, RecognitionActivity.class);
+                    intent.putExtra("currentMeetingId", currentMeeting.getMeetingId());
+                    intent.putExtra("beginTime", currentMeeting.getStartTime());
                     startActivity(intent);
                 }
             });
@@ -110,10 +135,21 @@ public class DetailsActivity extends BaseActivity {
         if (fragment != null) {
             manager.beginTransaction().remove(fragment).commit();
         }
+        isPay = false;
     }
 
     public void showQRCode(View view) {
+        iv_QR.setVisibility(View.VISIBLE);
+        iv_QR.setImageBitmap(QRCodeProducer.getStandardQRCode(this));
+        QRVisible = true;
+    }
 
+    @Override
+    public void onBackPressed() {
+        if(QRVisible)
+            iv_QR.setVisibility(View.GONE);
+        else
+            super.onBackPressed();
     }
 
     class TimeThread extends Thread {
@@ -125,6 +161,7 @@ public class DetailsActivity extends BaseActivity {
                     Message msg = new Message();
                     msg.what = msgTime;
                     handler.sendMessage(msg);
+                    getMeetings();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -136,13 +173,18 @@ public class DetailsActivity extends BaseActivity {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
             switch (msg.what) {
                 case msgTime:
-                    String[] s = getTime().split("-");
-                    tv_date.setText(s[0]);
-                    tv_time.setText(s[1]);
+                    if(isPay){
+                        String[] s = getTime().split("-");
+                        tv_date.setText(s[0]);
+                        tv_time.setText(s[1]);
+                    }
                     break;
+                    case msgSetAdapter:
+
+
+                        break;
                 default:
                     break;
             }
@@ -172,29 +214,52 @@ public class DetailsActivity extends BaseActivity {
     }
 
     private void getMeetings(){
-        StringBuilder builder = new StringBuilder(getApi());
+        StringBuilder builder = new StringBuilder("http://www.shidongxuan.top/smartMeeting_Web/access/getInfoByRoomNumber.do");
         builder.append("?roomNumber=");
         builder.append(getDoorplate());
+        Log.e(TAG,getDoorplate()+" null");
         OkHttpHelper.SendOkHttpRequest(builder.toString(), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(DetailsActivity.this, "网络超时", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(TAG, "???");
+                        Toast.makeText(DetailsActivity.this, "网络超时", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                MeetingRoom.DataBean dataBean =
-                        ResponseDataParser.RoomDataParser(response.body().string());
-                if(dataBean.getStatus()==0){
-                    meetings = ResponseDataParser.MeetingsDetailsParser(dataBean);
-                    if(adapter == null){
-                        adapter = new MeetingsAdapter(meetings, DetailsActivity.this);
-                        rv_meetings.setLayoutManager(new LinearLayoutManager(DetailsActivity.this));
-                        rv_meetings.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
-                    }
+                Log.e(TAG,response==null?"Re==null":"Re!=null");
+                room = ResponseDataParser.RoomMeetingsParser(response.body().string());
+                Log.e(TAG,room==null?"Room==null":"Room!=null");
+                Log.e(TAG, String.valueOf(room.getStatus()));
+                if(room!=null&&room.getStatus()==0){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!meetings.isEmpty())
+                                meetings.clear();
+                            meetings.addAll(room.getData().getMeetingLists());
+                            adapter.notifyDataSetChanged();
+                            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
+                            for(MeetingListsBean meeting : meetings){
+                                if(meeting.getStartTime().compareTo(date)<=0&&meeting.getEndTime().compareTo(date)>0){
+                                    currentMeeting = meeting;
+                                    break;
+                                }
+                            }
+                        }
+                    });
                 }else{
-                    Toast.makeText(DetailsActivity.this, "网络超时", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(DetailsActivity.this, "网络超时", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });

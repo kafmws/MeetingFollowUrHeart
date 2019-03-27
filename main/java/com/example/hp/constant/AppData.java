@@ -4,10 +4,9 @@ public class AppData {
 
     private static final String ArcAppId = "QCAJicnx5Z1K7f7pPEBRRPYN6DMcYD5v9CDs3isAaSj";
     private static final String ArcSdkKey = "2SWeGxKMUqjGQodm9nD7oW3YfABrSqwbvRRD9Tyja9y6";
-    private static boolean hasDeviceId;
+    private static boolean hasDoorplate;
     private static String deviceID;
     private static String doorplate;
-    private static String api = "http://www.shidongxuan.top/smartMeeting_Web/access/getInfoByRoomNumber.do";
 
     public static String getDeviceID() {
         return deviceID;
@@ -17,12 +16,12 @@ public class AppData {
         AppData.deviceID = deviceID;
     }
 
-    public static boolean hasDeviceId() {
-        return hasDeviceId;
+    public static boolean isHasDoorplate() {
+        return hasDoorplate;
     }
 
-    public static void setHasDeviceId(boolean hasDeviceId) {
-        AppData.hasDeviceId = hasDeviceId;
+    public static void setHasDoorplate(boolean hasDeviceId) {
+        AppData.hasDoorplate = hasDeviceId;
     }
 
     public static String getArcAppId() {
@@ -41,7 +40,4 @@ public class AppData {
         AppData.doorplate = doorplate;
     }
 
-    public static String getApi() {
-        return api;
-    }
 }

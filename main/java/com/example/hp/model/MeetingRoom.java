@@ -4,9 +4,10 @@ import java.util.List;
 
 public class MeetingRoom {
 
+
     /**
      * status : 0
-     * data : {"roomNumber":"FZ102","content":40,"machineNumber":"0000000002","status":2,"recentlyMeetings":[{"id":1002,"meetingName":"比赛会议","meetingIntro":"开始比赛","roomId":1001,"status":3,"masterId":1002,"startTime":1552829397000,"endTime":1552915797000,"createTime":1552570197000,"updateTime":1552570197000}],"id":1001}
+     * data : {"roomNumber":"FZ101","content":30,"machineNumber":"0000000001","status":1,"meetingLists":[{"meetingId":1010,"meetingName":"纳新庆祝会议","meetingIntro":"哈哈哈哈哈","peopleNum":2,"startTime":"2019-03-28 21:32:04","endTime":"2019-03-29 21:32:04","status":3,"userStatus":null,"memberStatus":[{"userId":1000,"username":"wcmwe","userStatus":4},{"userId":1002,"username":"wangshun","userStatus":1}],"roomId":1,"roomName":"FZ101","masterId":1002,"masterName":"wangshun"}],"id":1}
      */
 
     private int status;
@@ -30,12 +31,12 @@ public class MeetingRoom {
 
     public static class DataBean {
         /**
-         * roomNumber : FZ102
-         * content : 40
-         * machineNumber : 0000000002
-         * status : 2
-         * recentlyMeetings : [{"id":1002,"meetingName":"比赛会议","meetingIntro":"开始比赛","roomId":1001,"status":3,"masterId":1002,"startTime":1552829397000,"endTime":1552915797000,"createTime":1552570197000,"updateTime":1552570197000}]
-         * id : 1001
+         * roomNumber : FZ101
+         * content : 30
+         * machineNumber : 0000000001
+         * status : 1
+         * meetingLists : [{"meetingId":1010,"meetingName":"纳新庆祝会议","meetingIntro":"哈哈哈哈哈","peopleNum":2,"startTime":"2019-03-28 21:32:04","endTime":"2019-03-29 21:32:04","status":3,"userStatus":null,"memberStatus":[{"userId":1000,"username":"wcmwe","userStatus":4},{"userId":1002,"username":"wangshun","userStatus":1}],"roomId":1,"roomName":"FZ101","masterId":1002,"masterName":"wangshun"}]
+         * id : 1
          */
 
         private String roomNumber;
@@ -43,7 +44,7 @@ public class MeetingRoom {
         private String machineNumber;
         private int status;
         private int id;
-        private List<MeetingBean> recentlyMeetings;
+        private List<MeetingListsBean> meetingLists;
 
         public String getRoomNumber() {
             return roomNumber;
@@ -85,45 +86,51 @@ public class MeetingRoom {
             this.id = id;
         }
 
-        public List<MeetingBean> getRecentlyMeetings() {
-            return recentlyMeetings;
+        public List<MeetingListsBean> getMeetingLists() {
+            return meetingLists;
         }
 
-        public void setRecentlyMeetings(List<MeetingBean> recentlyMeetings) {
-            this.recentlyMeetings = recentlyMeetings;
+        public void setMeetingLists(List<MeetingListsBean> meetingLists) {
+            this.meetingLists = meetingLists;
         }
 
-        public static class MeetingBean {
+        public static class MeetingListsBean {
             /**
-             * id : 1002
-             * meetingName : 比赛会议
-             * meetingIntro : 开始比赛
-             * roomId : 1001
+             * meetingId : 1010
+             * meetingName : 纳新庆祝会议
+             * meetingIntro : 哈哈哈哈哈
+             * peopleNum : 2
+             * startTime : 2019-03-28 21:32:04
+             * endTime : 2019-03-29 21:32:04
              * status : 3
+             * userStatus : null
+             * memberStatus : [{"userId":1000,"username":"wcmwe","userStatus":4},{"userId":1002,"username":"wangshun","userStatus":1}]
+             * roomId : 1
+             * roomName : FZ101
              * masterId : 1002
-             * startTime : 1552829397000
-             * endTime : 1552915797000
-             * createTime : 1552570197000
-             * updateTime : 1552570197000
+             * masterName : wangshun
              */
 
-            private int id;
+            private int meetingId;
             private String meetingName;
             private String meetingIntro;
-            private int roomId;
+            private int peopleNum;
+            private String startTime;
+            private String endTime;
             private int status;
+            private Object userStatus;
+            private int roomId;
+            private String roomName;
             private int masterId;
-            private long startTime;
-            private long endTime;
-            private long createTime;
-            private long updateTime;
+            private String masterName;
+            private List<MemberStatusBean> memberStatus;
 
-            public int getId() {
-                return id;
+            public int getMeetingId() {
+                return meetingId;
             }
 
-            public void setId(int id) {
-                this.id = id;
+            public void setMeetingId(int meetingId) {
+                this.meetingId = meetingId;
             }
 
             public String getMeetingName() {
@@ -142,12 +149,28 @@ public class MeetingRoom {
                 this.meetingIntro = meetingIntro;
             }
 
-            public int getRoomId() {
-                return roomId;
+            public int getPeopleNum() {
+                return peopleNum;
             }
 
-            public void setRoomId(int roomId) {
-                this.roomId = roomId;
+            public void setPeopleNum(int peopleNum) {
+                this.peopleNum = peopleNum;
+            }
+
+            public String getStartTime() {
+                return startTime;
+            }
+
+            public void setStartTime(String startTime) {
+                this.startTime = startTime;
+            }
+
+            public String getEndTime() {
+                return endTime;
+            }
+
+            public void setEndTime(String endTime) {
+                this.endTime = endTime;
             }
 
             public int getStatus() {
@@ -158,6 +181,30 @@ public class MeetingRoom {
                 this.status = status;
             }
 
+            public Object getUserStatus() {
+                return userStatus;
+            }
+
+            public void setUserStatus(Object userStatus) {
+                this.userStatus = userStatus;
+            }
+
+            public int getRoomId() {
+                return roomId;
+            }
+
+            public void setRoomId(int roomId) {
+                this.roomId = roomId;
+            }
+
+            public String getRoomName() {
+                return roomName;
+            }
+
+            public void setRoomName(String roomName) {
+                this.roomName = roomName;
+            }
+
             public int getMasterId() {
                 return masterId;
             }
@@ -166,36 +213,56 @@ public class MeetingRoom {
                 this.masterId = masterId;
             }
 
-            public long getStartTime() {
-                return startTime;
+            public String getMasterName() {
+                return masterName;
             }
 
-            public void setStartTime(long startTime) {
-                this.startTime = startTime;
+            public void setMasterName(String masterName) {
+                this.masterName = masterName;
             }
 
-            public long getEndTime() {
-                return endTime;
+            public List<MemberStatusBean> getMemberStatus() {
+                return memberStatus;
             }
 
-            public void setEndTime(long endTime) {
-                this.endTime = endTime;
+            public void setMemberStatus(List<MemberStatusBean> memberStatus) {
+                this.memberStatus = memberStatus;
             }
 
-            public long getCreateTime() {
-                return createTime;
-            }
+            public static class MemberStatusBean {
+                /**
+                 * userId : 1000
+                 * username : wcmwe
+                 * userStatus : 4
+                 */
 
-            public void setCreateTime(long createTime) {
-                this.createTime = createTime;
-            }
+                private int userId;
+                private String username;
+                private int userStatus;
 
-            public long getUpdateTime() {
-                return updateTime;
-            }
+                public int getUserId() {
+                    return userId;
+                }
 
-            public void setUpdateTime(long updateTime) {
-                this.updateTime = updateTime;
+                public void setUserId(int userId) {
+                    this.userId = userId;
+                }
+
+                public String getUsername() {
+                    return username;
+                }
+
+                public void setUsername(String username) {
+                    this.username = username;
+                }
+
+                public int getUserStatus() {
+                    return userStatus;
+                }
+
+                public void setUserStatus(int userStatus) {
+                    this.userStatus = userStatus;
+                }
             }
         }
     }
