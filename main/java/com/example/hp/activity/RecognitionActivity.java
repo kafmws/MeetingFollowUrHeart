@@ -1,5 +1,6 @@
 package com.example.hp.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -18,12 +19,12 @@ import com.arcsoft.face.FaceEngine;
 import com.arcsoft.face.FaceFeature;
 import com.arcsoft.face.FaceInfo;
 import com.arcsoft.face.FaceSimilar;
-import com.example.hp.constant.AppData;
 import com.example.hp.constant.CheckInStatus;
 import com.example.hp.model.CheckInStatusResponse;
 import com.example.hp.model.MeetingCheckInStatus;
 import com.example.hp.model.R;
-import com.example.hp.model.UserFaceInfo;
+import com.example.hp.model.UserFaceInfoPack.UserFaceInfo;
+import com.example.hp.model.FaceFutureInfoPack.FaceFutureInfo;
 import com.example.hp.util.HardwareUtil;
 import com.example.hp.util.ImageUtil;
 import com.example.hp.util.OkHttpHelper;
@@ -31,8 +32,11 @@ import com.example.hp.util.ResponseDataParser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -46,28 +50,28 @@ import okhttp3.Response;
 public class RecognitionActivity extends BaseActivity implements SurfaceHolder.Callback {
 
     private String TAG = "RecognitionActivity";
-    private String data = "AAD6RAAAdENy6+28fiuhuF+MpbyaXPc8GYkPPQKcnb31dBA8g9c1vbfJMb0P9b28arRvvbz6kL31\n" +
-            "    7ZO9+VOSPM4mZ73Ft4Y6yei8vD5nar1Qh/E9lJKAvQWK8jy2bZy9F/LEvZb/8bwY8d07nt55vROI\n" +
-            "    er1LUOA89ZedvYpO5LkfAgM9p6FhPZUG0rzUyaM9PA2zvdRi5zyVSlC8HoMHPmTAwL2aDHG9MAfD\n" +
-            "    PDHApb0Y7DW8vh/MvbWv4zxlk189SwpHPTY06jxxRjG9rTQSvi2HjD3Dyhc82CqDPfWdpLzJzSM9\n" +
-            "    SXaOPDQWeb0HLUC88cEPvbfphT2GipC9UrzWPT0w1T0iIj09pgwxvJKxfbx99LG7VeyQvRrC2zzA\n" +
-            "    4w28q8uQvJAeoL0gfJu9zx3ovcVUyD0f5l09yxqlPeEP6zzR1G09m2wWvZBwVj0ugCm8ccUkPZ3f\n" +
-            "    TTxcfTq8AHHzvF8WwLxEVzk9Za2bvfQPgj1Xjiy9DxMePfUN2D3g976929Xhu9kfILymtRG+H+SB\n" +
-            "    vStMuDztfVO9UgV+O3T+Qb31JRA90bSlvLmw0jw0LSc9zowzvaDXVL0APQS9W1kUvuHZ7jwW8Zk8\n" +
-            "    T4FmvZFA8T1BqxA75EO/vU9ttLx03gc9c0kjPVg3Ij0uzjk9ExIOvb6zpbyiCDY9FuKOPAuqrbwC\n" +
-            "    WSQ87GoOPgNt4jwDNRW8qaciPVhgYr2IxLk8hw/FPbpdFD3w6tO8hXVxPQruCz3IhPe9QQeYPbr5\n" +
-            "    Fr3zfbI8HOC0vKKlDL2scYi9A2emPCgIKT0e9zm9jmYRvgVPab3E/oW9+UUQvVWw3D2A3uy9H6Hp\n" +
-            "    vMy7hz12LWO97Qdnuzi5gT1SJc87fBlxPNd+9rvxIai9wXRBPSkzMj4E+hq8GrLMPMlh1j3qz4i8\n" +
-            "    OwfrPIJctL3q1nW8rnbBvEUIlT2VjAg9BSyavScKurvAq309aPpKvXbkdz2Xmhq9bjoePjB3wL0G\n" +
-            "    NRS9o0s1voi/mT2qSm884Q3OPYitJz2El3S83JmXvTI2Szzn5ei90O9mvbE+3zviOpA9cjBcvS6O\n" +
-            "    LL2Q2vG8G7zlvAzXh725Lsw95mjPPFFze73Gl648c+laPRbB6Ty4d+C9cKsuu1z/kzxNj8s9i4fy\n" +
-            "    Pfw70D09vk89P/M2u0Vpmz1AuzC8RlQIPFpcVLyII6C8btJPPR6XTr3eyTo8XUDQvZGKM75UpEk9\n" +
-            "    EDsFPDSxV73ma4895wmqva7fkL1HemK81RJhPK/F7jxU5iQ90hkZPqZ0Rbym5Sc9skRmPId2ib0O\n" +
-            "    k8A9PtENvAnauTwxCgm834oKPOQO0byZuaO9fVmwPTUZg718sV+9n+rHPXiXKT1zE0Y9iP6IPLnU\n" +
-            "    mr0sJbG9";
-    private List<UserFaceInfo> userFaceInfos;//用户信息
-    private List<FaceFeature> featureList;//用户人脸信息
-    private MeetingCheckInStatus meetingCheckInStatus;//用户到会状况
+//    private String data = "AAD6RAAAdENy6+28fiuhuF+MpbyaXPc8GYkPPQKcnb31dBA8g9c1vbfJMb0P9b28arRvvbz6kL31\n" +
+//            "    7ZO9+VOSPM4mZ73Ft4Y6yei8vD5nar1Qh/E9lJKAvQWK8jy2bZy9F/LEvZb/8bwY8d07nt55vROI\n" +
+//            "    er1LUOA89ZedvYpO5LkfAgM9p6FhPZUG0rzUyaM9PA2zvdRi5zyVSlC8HoMHPmTAwL2aDHG9MAfD\n" +
+//            "    PDHApb0Y7DW8vh/MvbWv4zxlk189SwpHPTY06jxxRjG9rTQSvi2HjD3Dyhc82CqDPfWdpLzJzSM9\n" +
+//            "    SXaOPDQWeb0HLUC88cEPvbfphT2GipC9UrzWPT0w1T0iIj09pgwxvJKxfbx99LG7VeyQvRrC2zzA\n" +
+//            "    4w28q8uQvJAeoL0gfJu9zx3ovcVUyD0f5l09yxqlPeEP6zzR1G09m2wWvZBwVj0ugCm8ccUkPZ3f\n" +
+//            "    TTxcfTq8AHHzvF8WwLxEVzk9Za2bvfQPgj1Xjiy9DxMePfUN2D3g976929Xhu9kfILymtRG+H+SB\n" +
+//            "    vStMuDztfVO9UgV+O3T+Qb31JRA90bSlvLmw0jw0LSc9zowzvaDXVL0APQS9W1kUvuHZ7jwW8Zk8\n" +
+//            "    T4FmvZFA8T1BqxA75EO/vU9ttLx03gc9c0kjPVg3Ij0uzjk9ExIOvb6zpbyiCDY9FuKOPAuqrbwC\n" +
+//            "    WSQ87GoOPgNt4jwDNRW8qaciPVhgYr2IxLk8hw/FPbpdFD3w6tO8hXVxPQruCz3IhPe9QQeYPbr5\n" +
+//            "    Fr3zfbI8HOC0vKKlDL2scYi9A2emPCgIKT0e9zm9jmYRvgVPab3E/oW9+UUQvVWw3D2A3uy9H6Hp\n" +
+//            "    vMy7hz12LWO97Qdnuzi5gT1SJc87fBlxPNd+9rvxIai9wXRBPSkzMj4E+hq8GrLMPMlh1j3qz4i8\n" +
+//            "    OwfrPIJctL3q1nW8rnbBvEUIlT2VjAg9BSyavScKurvAq309aPpKvXbkdz2Xmhq9bjoePjB3wL0G\n" +
+//            "    NRS9o0s1voi/mT2qSm884Q3OPYitJz2El3S83JmXvTI2Szzn5ei90O9mvbE+3zviOpA9cjBcvS6O\n" +
+//            "    LL2Q2vG8G7zlvAzXh725Lsw95mjPPFFze73Gl648c+laPRbB6Ty4d+C9cKsuu1z/kzxNj8s9i4fy\n" +
+//            "    Pfw70D09vk89P/M2u0Vpmz1AuzC8RlQIPFpcVLyII6C8btJPPR6XTr3eyTo8XUDQvZGKM75UpEk9\n" +
+//            "    EDsFPDSxV73ma4895wmqva7fkL1HemK81RJhPK/F7jxU5iQ90hkZPqZ0Rbym5Sc9skRmPId2ib0O\n" +
+//            "    k8A9PtENvAnauTwxCgm834oKPOQO0byZuaO9fVmwPTUZg718sV+9n+rHPXiXKT1zE0Y9iP6IPLnU\n" +
+//            "    mr0sJbG9";
+
+    private HashMap<FaceFeature, Integer> faceFeatures = new HashMap<>();//用户人脸信息
+    private MeetingCheckInStatus meetingCheckInStatus = new MeetingCheckInStatus();//用户到会状况
     private int currentMeetingId;
     private long beginTime;
     private HardwareUtil door;
@@ -75,9 +79,11 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
     private Camera camera;
     private GLSurfaceView preview;
     private SurfaceHolder holder;
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     int screenWidth, screenHeight;
     boolean isPreview = false; // 是否在浏览中
+    boolean isOpen = false;
 
 
     @Override
@@ -90,7 +96,14 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
         holder.addCallback(this);
 
         currentMeetingId = getIntent().getIntExtra("currentMeetingId", -1);
-        beginTime = getIntent().getLongExtra("beginTime", -1);
+         String time = getIntent().getStringExtra("beginTime");
+         if(time!=null){
+             try {
+                 beginTime = format.parse(time).getTime();
+             } catch (ParseException e) {
+                 e.printStackTrace();
+             }
+         }
         getFaceFeatures();
 
         door = new HardwareUtil(this);
@@ -159,11 +172,23 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                                 image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-                                if (compare(bitmap, featureList)) {
-                                    door.openTheDoor();//给单片机发信号
+                                if (compare(bitmap, faceFeatures)) {
+                                    if(isOpen == false){
+                                        door.openTheDoor();//给单片机发信号
+                                        isOpen = true;
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(RecognitionActivity.this,"签到成功", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        Intent intent = getIntent();
+                                        intent.putExtra("status","0");
+                                        setResult(RESULT_OK, intent);
+                                        finish();
+                                    }
                                 }
                                 bos.flush();
-
                             } catch (Exception ex) {
                                 Log.e(TAG, "Error:" + ex.getMessage());
                             }
@@ -317,13 +342,13 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
         Log.e("com.arcsoft", "AFR_FSDK_UninitialEngine : " + errorCode);
     }
 
-    private boolean compare(Bitmap bitmap, List<FaceFeature> data) {
+    private boolean compare(Bitmap bitmap, HashMap<FaceFeature, Integer> data) {
 
-        int personIndex = 0;
+        int userId = 0;
         byte[] NV21FaceLeft = ImageUtil.bitmapToNv21(bitmap,
                 bitmap.getWidth(), bitmap.getHeight());
 
-        //用来存放提取到的人脸信息, face_1 是注册的人脸，face_2 是要识别的人脸
+        //bitmap提取到的人脸信息
         List<FaceInfo> faceInfoList = new ArrayList<>();
 
         //初始化人脸识别引擎，使用时请替换申请的 APPID 和 SDKKEY
@@ -333,9 +358,12 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
 
         Log.e("com.arcsoft", "detectFaces = " + errorCode);
 
-        if (faceInfoList.size() != 1) {
-//            Toast.makeText(this,"请上传单人照片",Toast.LENGTH_SHORT).show();
+        if (faceInfoList.size() > 1) {
+            Toast.makeText(this,"请保持镜头中只有一个人",Toast.LENGTH_SHORT).show();
             Log.e(TAG, "faceInfoListSize = " + faceInfoList.size());
+            return false;
+        }else if(faceInfoList.size() < 1){
+            Toast.makeText(this,"waiting",Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -351,14 +379,14 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
         //score 用于存放人脸对比的相似度值
         boolean isConfirm = false;
         FaceSimilar score = new FaceSimilar();
-        for (int i = 0; i < data.size(); i++) {
-            errorCode = engine.compareFaceFeature(feature, data.get(i), score);
-            personIndex = i;
+        for (FaceFeature featureI : new ArrayList<>(data.keySet())) {
+            errorCode = engine.compareFaceFeature(feature, featureI, score);
             Log.e("com.arcsoft", "AFR_FSDK_FacePairMatching=" + errorCode);
             Log.e("com.arcsoft", "Score:" + score.getScore());
             if (score.getScore() > 0.85) {
+                userId = data.get(featureI);
                 isConfirm = true;
-                Toast.makeText(this, "验证成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "验证成功", Toast.LENGTH_SHORT).show();
                 break;
             }
         }
@@ -367,22 +395,25 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
 //        Toast.makeText(this, String.valueOf((int)(score.getScore()*100)),Toast.LENGTH_SHORT).show();
 
         if (isConfirm) {//比对成功，更新签到状态
-            updateCheckInStatus(personIndex);
+            updateCheckInStatus(userId);
+            Log.e(TAG,"Toast Here");
+//            Toast.makeText(this, "签到成功",Toast.LENGTH_SHORT).show();
         }
         return isConfirm;
     }
 
-    private void updateCheckInStatus(int personIndex) {
-        String checkInStatus = null;
+    private void updateCheckInStatus(int userId) {
+        int checkInStatus;
         long currentTime = new Date().getTime();
-        checkInStatus = currentTime <= (beginTime - 10000) ? CheckInStatus.NORMAL : CheckInStatus.LATE;
+        checkInStatus = currentTime <= (beginTime + 600000) ? CheckInStatus.NORMAL : CheckInStatus.LATE;//10分钟算正常
+        Log.e("checkInStatus", String.valueOf(checkInStatus));
         OkHttpHelper.PostOkHttpRequest(new Request.Builder()
                 .url("http://www.shidongxuan.top/smartMeeting_Web/access/uploadUserMeetingStatus.do")
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .post(new FormBody.Builder()
-                        .add("userId", String.valueOf(userFaceInfos.get(personIndex).getUserId()))
+                        .add("userId", String.valueOf(userId))
                         .add("meetingId", String.valueOf(currentMeetingId))
-                        .add("userStatus", checkInStatus)
+                        .add("userStatus", String.valueOf(checkInStatus))
                         .build())
                 .build(), new Callback() {
             @Override
@@ -398,7 +429,7 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                final CheckInStatusResponse status = ResponseDataParser.checkInStatusResponseParser(data);
+                final CheckInStatusResponse status = ResponseDataParser.checkInStatusResponseParser(response.body().string());
                 if (status.getStatus() != 0) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -422,10 +453,8 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
     }
 
     private void getFaceFeatures() {
-        OkHttpHelper.SendOkHttpRequest("http://www.shidongxuan.top/" +
-                        "smartMeeting_Web/access/getAllUserStatus.do"
-                        + "?meetingId=" + currentMeetingId
-                , new Callback() {
+        String url = "http://www.shidongxuan.top/smartMeeting_Web/access/getAllUserByMeetingId.do?meetingId=" + currentMeetingId;
+        OkHttpHelper.SendOkHttpRequest(url, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         runOnUiThread(new Runnable() {
@@ -439,42 +468,52 @@ public class RecognitionActivity extends BaseActivity implements SurfaceHolder.C
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
-                        userFaceInfos = ResponseDataParser.faceFeaturesParser(data);
-                        featureList = new ArrayList<>();
-                        for (UserFaceInfo info : userFaceInfos) {
-                            featureList.add(info.getFaceFeature());
+                        faceFeatures.clear();
+                        List<FaceFutureInfo> faceInfoFeatures = ResponseDataParser.faceFeaturesParser(response.body().string());
+                        for (FaceFutureInfo info : faceInfoFeatures) {
+                            faceFeatures.put(new FaceFeature(Base64.decode(info.getFaceData(), 0)), info.getUserId());
                         }
-                        FaceFeature featureTest = new FaceFeature(new FaceFeature(Base64.decode(data, 0)));
-                        userFaceInfos.add(new UserFaceInfo(-1, "wangshunTest", featureTest));
-                        featureList.add(featureTest);
+//                        FaceFeature featureTest = new FaceFeature(new FaceFeature(Base64.decode(data, 0)));
+//                        userFaceInfos.add(new UserFaceInfo(-1, "wangshunTest", featureTest));
+//                        faceFeatures.add(featureTest);
                     }
                 });
     }
 
-    private void getMeetingCheckInStatus() {
-        OkHttpHelper.SendOkHttpRequest(
-                "http://www.shidongxuan.top/smartMeeting_Web/access/getAllUserStatus.do" + currentMeetingId,
-                new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.e(TAG, "网络请求失败");
-                                Toast.makeText(RecognitionActivity.this, "数据获取失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+//    private void getMeetingCheckInStatus() {
+//        OkHttpHelper.SendOkHttpRequest(
+//                "http://www.shidongxuan.top/smartMeeting_Web/access/getAllUserStatus.do" + currentMeetingId,
+//                new Callback() {
+//                    @Override
+//                    public void onFailure(Call call, IOException e) {
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Log.e(TAG, "网络请求失败");
+//                                Toast.makeText(RecognitionActivity.this, "数据获取失败", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onResponse(Call call, Response response) throws IOException {
+//                        MeetingCheckInStatus status = ResponseDataParser
+//                                .meetingCheckInStatusParser(response.body().string());
+//                    }
+//                }
+//        );
+//
+//    }
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        MeetingCheckInStatus status = ResponseDataParser
-                                .meetingCheckInStatusParser(response.body().string());
-                    }
-                }
-        );
-
+        @Override
+    public void onBackPressed() {
+            Intent intent = getIntent();
+            intent.putExtra("status","1");
+            setResult(RESULT_OK+1, intent);
+            finish();
     }
+
+
 }
 
 

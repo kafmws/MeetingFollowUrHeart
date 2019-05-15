@@ -27,18 +27,24 @@ import static com.example.hp.constant.AppData.getDoorplate;
 
 public class QRCodeProducer {
 
-    public static Bitmap getStandardQRCode(Context context) {
+    public static Bitmap getStandardQRCode(Context context, String content) {
         File file = context.getCacheDir();
         String filePath = file.getAbsolutePath() + "\\QRCode.jpg";
 //        try {
-            return createQRCode(getDoorplate(),//DesUtil.talker.encrypt(getDoorplate())+ "\n"+getIMEI(context),
+        try {
+            return createQRCode(DesUtil.talker.encrypt(content),//DesUtil.talker.encrypt(getDoorplate())+ "\n"+getIMEI(context),
                     800, 800, null, filePath);
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
 //        } catch (BadPaddingException e) {
 //            e.printStackTrace();
 //        } catch (IllegalBlockSizeException e) {
 //            e.printStackTrace();
 //        }
-//        return null;
+        return null;
     }
 
     /**

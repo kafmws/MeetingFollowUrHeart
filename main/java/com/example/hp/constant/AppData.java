@@ -7,6 +7,7 @@ public class AppData {
     private static boolean hasDoorplate;
     private static String deviceID;
     private static String doorplate;
+    private static String roomId;
 
     public static String getDeviceID() {
         return deviceID;
@@ -40,4 +41,11 @@ public class AppData {
         AppData.doorplate = doorplate;
     }
 
+    public static String getRoomId() {
+        return roomId;
+    }
+
+    public static void setRoomId(String roomId) {
+        AppData.roomId = roomId;
+    }
 }

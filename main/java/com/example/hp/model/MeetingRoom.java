@@ -125,6 +125,23 @@ public class MeetingRoom {
             private String masterName;
             private List<MemberStatusBean> memberStatus;
 
+            public MeetingListsBean(int meetingId, String meetingName, String meetingIntro, int peopleNum,
+                                    String startTime, String endTime, int status, Object userStatus, int roomId, String roomName, int masterId, String masterName, List<MemberStatusBean> memberStatus) {
+                this.meetingId = meetingId;
+                this.meetingName = meetingName;
+                this.meetingIntro = meetingIntro;
+                this.peopleNum = peopleNum;
+                this.startTime = startTime;
+                this.endTime = endTime;
+                this.status = status;
+                this.userStatus = userStatus;
+                this.roomId = roomId;
+                this.roomName = roomName;
+                this.masterId = masterId;
+                this.masterName = masterName;
+                this.memberStatus = memberStatus;
+            }
+
             public int getMeetingId() {
                 return meetingId;
             }
@@ -239,6 +256,12 @@ public class MeetingRoom {
                 private int userId;
                 private String username;
                 private int userStatus;
+
+                public MemberStatusBean(int userId, String username, int userStatus) {
+                    this.userId = userId;
+                    this.username = username;
+                    this.userStatus = userStatus;
+                }
 
                 public int getUserId() {
                     return userId;

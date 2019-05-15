@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:orientation="vertical"
+    android:layout_gravity="center"
     android:layout_margin="2dp">
 
     <LinearLayout
@@ -39,7 +40,8 @@
                         android:text="班助选举"
                         android:textColor="@android:color/black"
                         android:textSize="30sp"
-                        android:layout_marginHorizontal="20dp"/>
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp" />
 
                     <TextView
                         android:id="@+id/tv_meeting_status"
@@ -186,6 +188,6 @@
         android:id="@+id/view_line"
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:background="#f8f8f8" />
+        android:background="#F8F8F8" />
 
 </LinearLayout>

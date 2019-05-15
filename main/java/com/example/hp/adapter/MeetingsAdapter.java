@@ -14,6 +14,10 @@ import com.example.hp.model.MeetingRoom.DataBean.MeetingListsBean;
 
 import java.util.List;
 
+import static com.example.hp.util.TimeUtil.date2time;
+import static com.example.hp.util.TimeUtil.setSecond;
+import static com.example.hp.util.TimeUtil.subtract;
+
 public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHolder> {
 
     private List<MeetingListsBean> meetings;
@@ -87,14 +91,15 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
             tv_meeting_name.setText(meeting.getMeetingName());
             tv_people_number.setText(String.valueOf(meeting.getPeopleNum()));
             tv_place.setText(meeting.getRoomName());
-            tv_meeting_time_length.setText("100");
-            tv_meeting_master.setText("");
-            tv_meeting_time.setText(meeting.getStartTime());
-            if (i == meetings.size() - 1) {
-                line.setVisibility(View.GONE);
-            } else {
-                line.setVisibility(View.VISIBLE);
-            }
+            tv_meeting_time_length.setText(subtract(meeting.getEndTime(),meeting.getStartTime())+" min");
+            tv_meeting_master.setText(meeting.getMasterName());
+            tv_meeting_time.setText(setSecond(meeting.getStartTime())  + " ~ "
+                    + setSecond(date2time(meeting.getEndTime())));
+//            if (i == meetings.size() - 1) {
+//                line.setVisibility(View.GONE);
+//            } else {
+//                line.setVisibility(View.VISIBLE);
+//            }
         }
     }
 

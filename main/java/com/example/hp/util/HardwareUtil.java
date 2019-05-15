@@ -115,7 +115,7 @@ public class HardwareUtil {
 
         handler = new Handler() {
             public void handleMessage(Message msg){
-                Toast.makeText(activity,(String)msg.obj,Toast.LENGTH_SHORT).show();
+//                Toast.makeText(activity,(String)msg.obj,Toast.LENGTH_SHORT).show();
             }
         };
 

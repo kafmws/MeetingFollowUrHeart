@@ -11,8 +11,8 @@
 
         <TextView
             android:id="@+id/tv_doorplate"
-            android:text="FZ155"
-            android:textSize="35sp"
+            android:text="FZ101"
+            android:textSize="50sp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
 
         <TextView
             android:id="@+id/tv_status"
-            android:text="空闲"
+            android:text="使用中"
             android:textSize="45sp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"
